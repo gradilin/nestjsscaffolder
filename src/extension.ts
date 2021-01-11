@@ -1,6 +1,11 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { ClassBuilder } from '../ClassBuilder';
+
+
+function splitLines(t:string) { return t.split(/\r\n|\r|\n/); }
+
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -20,24 +25,30 @@ export function activate(context: vscode.ExtensionContext) {
             var editor = vscode.window.activeTextEditor;
             const selection = editor!.selection;
 
-            if (selection == null) {
+            if (selection.isEmpty) {
                 vscode.window.showInformationMessage('Nothing Selected');
             } else {
                 vscode.window.showInformationMessage('Success');
 
                 var docText = editor?.document.getText();
-                var textLines = docText?.split('/n');
-
-                let className = '';
-                let classStarted = false;
+                var textLines = docText?.split(/\r?\n/);
+                
+                let classDef = new ClassBuilder(); 
                 if (textLines) {
                     textLines.forEach((line:string) => { 
                         if(line.toLowerCase().indexOf('export') > -1 && line.toLowerCase().indexOf('class') > -1) {
                             let words = line.toLowerCase().split(" ");
                             let classIndex = words.indexOf("class") + 1;
-                            className =   line.split(" ")[classIndex];
+                            classDef.className = line.split(" ")[classIndex];
                         }
+                        
+
+                    
+                    
+                    
+                    
                     });
+
                 }
             }
 
@@ -53,7 +64,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
     );
 
-    let disposableCreateMOdule;
+    let disposableCreateModule;
 
     context.subscriptions.push(disposable);
 }
